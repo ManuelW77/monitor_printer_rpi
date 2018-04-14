@@ -58,10 +58,10 @@ def colorWipe(strip, color, wait_ms=50):
 
 
 def ledPrintState(c, wait_ms=50):
-	if debug is True:
-		print "SHow ledPrintState -> " + str(c)
-	
     state = int(strip.numPixels()*c/100)
+
+	if debug is True:
+		print "Show ledPrintState -> " + str(c) + " -> " + str(state)
 
     for i in range(0, strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))
