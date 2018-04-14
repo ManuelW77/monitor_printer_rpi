@@ -93,12 +93,12 @@ def ledPrintState(c, wait_ms=50):
 
 
 def ledHeatingState(data):
-	if debug is True:
-		print "Show ledHeatingState -> " + str(data[0]) + " | " + str(data[1])
-
     # c = current, t = target
     c = data[0]
     t = data[1]
+
+	if debug is True:
+		print "Show ledHeatingState -> " + str(c) + " | " + str(t)
 
     # led = Prozent der Zieltemp erreicht
     led = int(c * 100.0 / t)
@@ -127,9 +127,6 @@ def ledHeatingState(data):
 
 
 def displayPrintState(what, data):
-	if debug is True:
-		print "Show displayPrintState -> " + what
-
     global width, height
 
     '''
@@ -137,6 +134,9 @@ def displayPrintState(what, data):
     Leerer Bereich Reihe 16
     Blauer Bereich Reihe 17 - 64
     '''
+
+	if debug is True:
+		print "Show displayPrintState -> " + what
 
     # Trennlinie
     draw.rectangle((0, 13, 128, 15), outline=0, fill=1)
@@ -164,6 +164,9 @@ def displayPrintState(what, data):
 
 def clearAll():
     global width, height  # Display Data
+    
+	if debug is True:
+		print "Clear Display and Strip"
 
     colorWipe(strip, Color(0, 0, 255))
 
@@ -173,6 +176,9 @@ def clearAll():
 
 
 def powerOffAll():
+	if debug is True:
+		print "Power OFF all!"
+
     colorWipe(strip, Color(0, 0, 0))
     draw.rectangle((0, 0, width, height), outline=0, fill=0)  # clean
     disp.image(image)
@@ -180,6 +186,8 @@ def powerOffAll():
 
 
 def powerOnAll():
+	if debug is True:
+		print "Power ON all!"
     # Display Welcome Message
     draw.text((20, 0), "Willkommen ...", font=font16, fill=255)
     draw.text((35, 20), "Tronxy", font=font16, fill=255)
@@ -193,11 +201,16 @@ def powerOnAll():
 
 
 def boardFanOff():
+	if debug is True:
+		print "Board Fan off"
     # Board Fan off
     GPIO.output(rPin2, GPIO.HIGH)
 
 
 def bedFanOff():
+	if debug is True:
+		print "Bed Fan off"
+
     # Bed Fan off
     GPIO.output(rPin3, GPIO.HIGH)
 
@@ -241,8 +254,7 @@ def on_message(client, userdata, msg):
         output = json.loads(msg.payload)
 
         if debug is True:
-            print "Message arrived: " + msg.topic
-            print str(output)
+            print "Message arrived: [" + msg.topic + "]: " + str(output)
 
         # Aktionen nach Topic aufteilen
         # Druckstart
@@ -261,14 +273,14 @@ def on_message(client, userdata, msg):
             ledPrintState(0)
 
         # Druckende
-        if ("PrintDone" or "PrintCancelled" or "PrintFailed") in msg.topic:
+        elif ("PrintDone" or "PrintCancelled" or "PrintFailed") in msg.topic:
         	if debug is True:
         		print "Print Done"
 
             pState = False
 
         # Info über Druck
-        if "progress/printing" in msg.topic:
+        elif "progress/printing" in msg.topic:
         	if debug is True:
         		print "Progress Update Message"
 
@@ -301,7 +313,7 @@ def on_message(client, userdata, msg):
             lastPercent = output["progress"]
 
         # Hotend
-        if "tool0" in msg.topic:
+        elif "tool0" in msg.topic:
         	if debug is True:
         		print "Tool0 Update Message"
 
@@ -316,7 +328,7 @@ def on_message(client, userdata, msg):
                 ledPrintState(lastPercent)
 
         # Bed
-        if "bed" in msg.topic:
+        elif "bed" in msg.topic:
         	if debug is True:
         		print "Bed Update Message"
 
@@ -324,14 +336,14 @@ def on_message(client, userdata, msg):
             displayPrintState("bed", data)
 
         # On Error or Disconnect Shut Off
-        if "Error" in msg.topic or "Disconnect" in msg.topic:
+        elif "Error" in msg.topic or "Disconnect" in msg.topic:
         	if Debug is True:
         		print "Error happens while printing"
 
             client.publish("esp_tronxy_pow/relay/0/set", "0")
 
         # On shut printer off
-        if "power" in msg.topic:
+        elif "power" in msg.topic:
             if output["power"] == "off":
             	if debug is True:
             		print "Power Off"
@@ -343,10 +355,12 @@ def on_message(client, userdata, msg):
             		print "Power on"
 
                 powerOnAll()
+        		
+        else:
+        	if debug is True:
+        		print "undefined Message..."
 
     except BaseException:
-        # output = msg.payload
-
         if debug is True:
             print "Exception: " + str(msg.payload)
 
@@ -412,8 +426,11 @@ try:
     displayPrintTime = False
 
     while True:
-        # Wenn ein Druck läuft aller 10sek
-        if pState is True and (time.time()-lastTime > 10 or lastTime == 0):
+        # Wenn ein Druck läuft aller 15sek
+        if pState is True and (time.time()-lastTime > 15 or lastTime == 0):
+        	if debug is True:
+        		print "lastTime = 0 or 5sek left (printing: " + pState + ")"
+
             lastTime = time.time()
 
             draw.rectangle((0, 0, width, 12), outline=0, fill=0)  # clean
