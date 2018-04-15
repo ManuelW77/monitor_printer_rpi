@@ -281,6 +281,14 @@ def getApiData():
     return printTime, printTimeLeft
 
 
+def is_json(myjson):
+  try:
+    json_object = json.loads(myjson)
+  except ValueError, e:
+    return False
+  return True
+
+
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     client.subscribe("octoprint/#")
@@ -291,174 +299,175 @@ def on_message(client, userdata, msg):
     global pState, printDone, lastPercent  # Druckstatus
     global bed_data, tool0_data
 
-    try:
-        output = json.loads(msg.payload)
-
-        if debug is True:
-            print "Message arrived: [" + msg.topic + "]: " + str(output)
-            print "----------"
-
-        # Aktionen nach Topic aufteilen
-        # Druckstart
-        if "PrintStarted" in msg.topic:
+    if is_json(msg.payload) is True:
+        try:
+            output = json.loads(msg.payload)
+    
             if debug is True:
-                print "Print Started"
+                print "Message arrived: [" + msg.topic + "]: " + str(output)
                 print "----------"
-
-            pState = True
-            printDone = False
-            clearAll()
-
-            path = output["path"].replace(".gcode", "")
-            # Displayausgabe
-            data = [path, 0]
-            displayPrintState("progress", data)
-            # LED Ausgabe
-            ledPrintState(0)
-
-        # Druckende
-        elif "PrintDone" in msg.topic or "PrintCancelled" in msg.topic or "PrintFailed" in msg.topic:
-            if "PrintDone" in msg.topic:
-                path = "Print Done..."
-                
+    
+            # Aktionen nach Topic aufteilen
+            # Druckstart
+            if "PrintStarted" in msg.topic:
                 if debug is True:
-                    print "Print Done..."
+                    print "Print Started"
                     print "----------"
-
-            elif "PrintCancelled" in msg.topic:
-                path = "Print Cancelled..."
-                
-                if debug is True:
-                    print "Print Cancelled..."
-                    print "----------"
-                    
-            else:
-                path = "Print Failed..."
-                
-                if debug is True:
-                    print "Print Failed..."
-                    print "----------"
-
-            # Displayausgabe
-            data = [path, 0]
-            displayPrintState("progress", data)
-
-            pState = False
-            printDone = True
-            boardFanOff()
-
-        # Info über Druck
-        elif "progress/printing" in msg.topic:
-            if debug is True:
-                print "Progress Update Message"
-                print "----------"
-
-            '''
-            if lastPercent < output["progress"] and output["progress"] != 100 and pState is False:
-                if debug is True:
-                    print "Starte Druckinfo im bereits laufenden Druck"
-                    print "----------"
-
+    
                 pState = True
+                printDone = False
                 clearAll()
-            '''
-
-            if pState is True:
-                if debug is True:
-                    print "is Printing..."
-                    print "----------"
-
+    
                 path = output["path"].replace(".gcode", "")
-
-                if output["progress"] != lastPercent or output["progress"] == 0:
-                    # Displayausgabe
-                    data = [path, output["progress"]]
-                    displayPrintState("progress", data)
-                    # LED Ausgabe
-                    ledPrintState(output["progress"])
-
+                # Displayausgabe
+                data = [path, 0]
+                displayPrintState("progress", data)
+                # LED Ausgabe
+                ledPrintState(0)
+    
+            # Druckende
+            elif "PrintDone" in msg.topic or "PrintCancelled" in msg.topic or "PrintFailed" in msg.topic:
+                if "PrintDone" in msg.topic:
+                    path = "Print Done..."
+                    
+                    if debug is True:
+                        print "Print Done..."
+                        print "----------"
+    
+                elif "PrintCancelled" in msg.topic:
+                    path = "Print Cancelled..."
+                    
+                    if debug is True:
+                        print "Print Cancelled..."
+                        print "----------"
+                        
+                else:
+                    path = "Print Failed..."
+                    
+                    if debug is True:
+                        print "Print Failed..."
+                        print "----------"
+    
+                # Displayausgabe
+                data = [path, 0]
+                displayPrintState("progress", data)
+    
+                pState = False
+                printDone = True
+                boardFanOff()
+    
+            # Info über Druck
+            elif "progress/printing" in msg.topic:
+                if debug is True:
+                    print "Progress Update Message"
+                    print "----------"
+    
+                '''
+                if lastPercent < output["progress"] and output["progress"] != 100 and pState is False:
+                    if debug is True:
+                        print "Starte Druckinfo im bereits laufenden Druck"
+                        print "----------"
+    
+                    pState = True
+                    clearAll()
+                '''
+    
+                if pState is True:
+                    if debug is True:
+                        print "is Printing..."
+                        print "----------"
+    
+                    path = output["path"].replace(".gcode", "")
+    
+                    if output["progress"] != lastPercent or output["progress"] == 0:
+                        # Displayausgabe
+                        data = [path, output["progress"]]
+                        displayPrintState("progress", data)
+                        # LED Ausgabe
+                        ledPrintState(output["progress"])
+    
+                else:
+                    if debug is True:
+                        print "is not Printing..."
+                        print "----------"
+    
+                    path = "Not printing..."
+    
+                lastPercent = output["progress"]
+    
+            # Hotend
+            elif "tool0" in msg.topic:
+                if debug is True:
+                    print "Tool0 Update Message"
+                    print "----------"
+    
+                tool0_data = [int(output["actual"]), int(output["target"])]
+                # Displayausgabe
+                displayPrintState("tool0", tool0_data)
+    
+                # LED Ausgabe, wenn kein Druck läuft zeige Temp sonst Prozent
+                if pState is False:
+                    ledHeatingState(tool0_data)
+                else:
+                    ledPrintState(lastPercent)
+    
+            # Bed
+            elif "bed" in msg.topic:
+                if debug is True:
+                    print "Bed Update Message"
+                    print "----------"
+    
+                bed_data = [int(output["actual"]), int(output["target"])]
+                displayPrintState("bed", bed_data)
+                
+                if int(output["actual"]) < 38 and int(output["target"]) == 0 and pState is False:
+                    bedFanOff()
+    
+                    if debug is True:
+                        print "Switch Bedfan OFF"
+                        print "----------"
+    
+            # On Error or Disconnect Shut Off
+            elif "Error" in msg.topic or "Disconnect" in msg.topic:
+                if Debug is True:
+                    print "Error happens while printing"
+                    print "----------"
+    
+                client.publish("esp_tronxy_pow/relay/0/set", "0")
+    
+            # On shut printer off
+            elif "power" in msg.topic:
+                if output["power"] == "off":
+                    powerOffAll()
+    
+                elif output["power"] == "on":
+                    powerOnAll()
+            '''		
             else:
                 if debug is True:
-                    print "is not Printing..."
+                    print "undefined Message..."
                     print "----------"
-
-                path = "Not printing..."
-
-            lastPercent = output["progress"]
-
-        # Hotend
-        elif "tool0" in msg.topic:
-            if debug is True:
-                print "Tool0 Update Message"
-                print "----------"
-
-            tool0_data = [int(output["actual"]), int(output["target"])]
-            # Displayausgabe
-            displayPrintState("tool0", tool0_data)
-
-            # LED Ausgabe, wenn kein Druck läuft zeige Temp sonst Prozent
-            if pState is False:
-                ledHeatingState(tool0_data)
-            else:
-                ledPrintState(lastPercent)
-
-        # Bed
-        elif "bed" in msg.topic:
-            if debug is True:
-                print "Bed Update Message"
-                print "----------"
-
-            bed_data = [int(output["actual"]), int(output["target"])]
-            displayPrintState("bed", bed_data)
-            
-            if int(output["actual"]) < 38 and int(output["target"]) == 0 and pState is False:
-                bedFanOff()
-
+            '''
+            # Alles ausschalten nach Druck und wenn unter Temps
+            if printDone is True:
                 if debug is True:
-                    print "Switch Bedfan OFF"
+                    print "Watch for Power Off ----> " + str(printDone) + " - " + str(tool0_data[0]) + " - " + str(bed_data[0])
                     print "----------"
-
-        # On Error or Disconnect Shut Off
-        elif "Error" in msg.topic or "Disconnect" in msg.topic:
-            if Debug is True:
-                print "Error happens while printing"
-                print "----------"
-
-            client.publish("esp_tronxy_pow/relay/0/set", "0")
-
-        # On shut printer off
-        elif "power" in msg.topic:
-            if output["power"] == "off":
+    
+            if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 35 and bed_data[1] == 0:
                 powerOffAll()
-
-            elif output["power"] == "on":
-                powerOnAll()
-        '''		
-        else:
+                client.publish("esp_tronxy_pow/relay/0/set", "0")
+                printDone = False
+    
+        except Exception as err:
+            print err
+    
             if debug is True:
-                print "undefined Message..."
+                print "Exception: " + str(msg.payload)
                 print "----------"
-        '''
-        # Alles ausschalten nach Druck und wenn unter Temps
-        if printDone is True:
-            if debug is True:
-                print "Watch for Power Off ----> " + str(printDone) + " - " + str(tool0_data[0]) + " - " + str(bed_data[0])
-                print "----------"
-
-        if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 35 and bed_data[1] == 0:
-            powerOffAll()
-            client.publish("esp_tronxy_pow/relay/0/set", "0")
-            printDone = False
-
-    except Exception as err:
-        print err
-
-        if debug is True:
-            print "Exception: " + str(msg.payload)
-            print "----------"
-        
-        # pass
-        raise
+            
+            # pass
+            raise
 
 
 def getPrintTime(pt):
