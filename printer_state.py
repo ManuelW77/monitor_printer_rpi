@@ -36,6 +36,8 @@ debug = True
 pState = False
 printDone = False
 lastPercent = 0
+bed_data = [0, 0]
+tool0_data = [0, 0]
 
 # GPIO als OUTPUT setzen
 GPIO.setmode(GPIO.BCM)
