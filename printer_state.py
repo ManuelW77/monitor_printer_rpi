@@ -221,7 +221,7 @@ def getApiData():
     url = "http://localhost/api/job"
     headers = {"X-Api-Key": "944145C8AF374B77B6D66BD88C410C1D", "Content-Type": "application/json"}
 
-	try:
+    try:
 	    response = requests.get(url, headers=headers)
 	    printTime = response.json()["progress"]["printTime"]
 	    printTimeLeft = response.json()["progress"]["printTimeLeft"]
@@ -229,7 +229,7 @@ def getApiData():
 	    if debug is True:
             print "API Abfrage erfolgreich"
 
-	except BaseException:
+    except BaseException:
         if debug is True:
             print "Fehler beim Abfrage den API"
 
