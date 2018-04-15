@@ -34,6 +34,7 @@ debug = True
 
 # Druckstatus
 pState = False
+printDone = False
 lastPercent = 0
 
 # GPIO als OUTPUT setzen
@@ -48,7 +49,6 @@ GPIO.setup(rPin4, GPIO.OUT)
 # GPIO.output(rPin2, GPIO.HIGH)
 # GPIO.output(rPin3, GPIO.HIGH)
 # GPIO.output(rPin4, GPIO.HIGH)
-
 
 def colorWipe(strip, color, wait_ms=50):
     for i in range(strip.numPixels()):
@@ -260,7 +260,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     global width, height  # Display Data
-    global pState, lastPercent  # Druckstatus
+    global pState, printDone, lastPercent  # Druckstatus
 
     try:
         output = json.loads(msg.payload)
@@ -277,6 +277,7 @@ def on_message(client, userdata, msg):
                 print "----------"
 
             pState = True
+            printDone = False
             clearAll()
 
             path = output["path"].replace(".gcode", "")
@@ -289,10 +290,11 @@ def on_message(client, userdata, msg):
         # Druckende
         elif "PrintDone" in msg.topic or "PrintCancelled" in msg.topic or "PrintFailed" in msg.topic:
             if debug is True:
-                print "Print Done, Cancelled or Failed, switch Boardfan OFF"
+                print "Print Done, Cancelled or Failed"
                 print "----------"
 
             pState = False
+            printDone = True
             boardFanOff()
 
         # Info über Druck
@@ -340,13 +342,13 @@ def on_message(client, userdata, msg):
                 print "Tool0 Update Message"
                 print "----------"
 
-            data = [int(output["actual"]), int(output["target"])]
+            tool0_data = [int(output["actual"]), int(output["target"])]
             # Displayausgabe
-            displayPrintState("tool0", data)
+            displayPrintState("tool0", tool0_data)
 
             # LED Ausgabe, wenn kein Druck läuft zeige Temp sonst Prozent
             if pState is False:
-                ledHeatingState(data)
+                ledHeatingState(tool0_data)
             else:
                 ledPrintState(lastPercent)
 
@@ -356,12 +358,12 @@ def on_message(client, userdata, msg):
                 print "Bed Update Message"
                 print "----------"
 
-            data = [int(output["actual"]), int(output["target"])]
-            displayPrintState("bed", data)
+            bed_data = [int(output["actual"]), int(output["target"])]
+            displayPrintState("bed", bed_data)
             
-            if int(output["actual"]) < 38 and pState is False:
+            if int(output["actual"]) < 38 and int(output["target"] == 0 and pState is False:
                 bedFanOff()
-                
+
                 if debug is True:
                     print "Switch Bedfan OFF"
                     print "----------"
@@ -395,6 +397,11 @@ def on_message(client, userdata, msg):
                 print "undefined Message..."
                 print "----------"
         '''
+
+        # Alles ausschlten nach Druck und wenn unter Temps
+        if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 38 and bed_data[1] == 0:
+            powerOffAll()
+            client.publish("esp_tronxy_pow/relay/0/set", "0")
 
     except BaseException:
         ex = True
