@@ -52,13 +52,6 @@ GPIO.setup(rPin4, GPIO.OUT)
 # GPIO.output(rPin3, GPIO.HIGH)
 # GPIO.output(rPin4, GPIO.HIGH)
 
-# Start MQTT
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect("192.168.1.5", 1883, 60)
-client.loop_start()
-
 # Start Display
 disp.begin()
 width = disp.width
@@ -490,6 +483,13 @@ def getPrintTime(pt):
 
     return printTime
 
+
+# Start MQTT
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("192.168.1.5", 1883, 60)
+client.loop_start()
 
 try:
     lastTime = 0
