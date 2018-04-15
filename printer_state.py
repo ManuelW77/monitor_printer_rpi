@@ -454,9 +454,9 @@ try:
     while True:
         # Wenn ein Druck läuft aller 15sek
         if pState is True and (time.time()-lastTime > 15 or lastTime == 0):
-        	if debug is True:
-        		print "lastTime = 0 or 5sek left (printing: " + str(pState) + ")"
-        		print "----------"
+            if debug is True:
+                print "lastTime = 0 or 5sek left (printing: " + str(pState) + ")"
+                print "----------"
 
             lastTime = time.time()
 
