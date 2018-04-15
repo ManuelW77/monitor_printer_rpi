@@ -287,7 +287,7 @@ def on_message(client, userdata, msg):
             ledPrintState(0)
 
         # Druckende
-        elif ("PrintDone" or "PrintCancelled" or "PrintFailed") in msg.topic:
+        elif ("PrintDone" or "PrintCancelling" or "PrintCancelled" or "PrintFailed") in msg.topic:
             if debug is True:
                 print "Print Done, switch Boardfan OFF"
                 print "----------"
@@ -359,7 +359,7 @@ def on_message(client, userdata, msg):
             data = [int(output["actual"]), int(output["target"])]
             displayPrintState("bed", data)
             
-            if int(output["actual"]) < 38:
+            if int(output["actual"]) < 38 and pState is False:
                 bedFanOff()
                 
                 if debug is True:
