@@ -282,11 +282,11 @@ def getApiData():
 
 
 def is_json(myjson):
-  try:
-    json_object = json.loads(myjson)
-  except ValueError, e:
-    return False
-  return True
+    try:
+        json_object = json.loads(myjson)
+    except ValueError, e:
+        return False
+    return True
 
 
 def on_connect(client, userdata, flags, rc):
