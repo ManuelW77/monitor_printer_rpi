@@ -261,6 +261,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     global width, height  # Display Data
     global pState, printDone, lastPercent  # Druckstatus
+    global bed_data, tool0_data
 
     try:
         output = json.loads(msg.payload)
@@ -289,9 +290,30 @@ def on_message(client, userdata, msg):
 
         # Druckende
         elif "PrintDone" in msg.topic or "PrintCancelled" in msg.topic or "PrintFailed" in msg.topic:
-            if debug is True:
-                print "Print Done, Cancelled or Failed"
-                print "----------"
+            if "PrintDone" in msg.topic:
+                path = "Print Done..."
+                
+                if debug is True:
+                    print "Print Done..."
+                    print "----------"
+
+            elif "PrintCancelled" in msg.topic:
+                path = "Print Cancelled..."
+                
+                if debug is True:
+                    print "Print Cancelled..."
+                    print "----------"
+                    
+            else:
+                path = "Print Failed..."
+                
+                if debug is True:
+                    print "Print Failed..."
+                    print "----------"
+
+            # Displayausgabe
+            data = [path, 0]
+            displayPrintState("progress", data)
 
             pState = False
             printDone = True
