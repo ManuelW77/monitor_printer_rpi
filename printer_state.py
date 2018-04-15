@@ -267,12 +267,14 @@ def on_message(client, userdata, msg):
 
         if debug is True:
             print "Message arrived: [" + msg.topic + "]: " + str(output)
+            print "----------"
 
         # Aktionen nach Topic aufteilen
         # Druckstart
         if "PrintStarted" in msg.topic:
             if debug is True:
                 print "Print Started"
+                print "----------"
 
             pState = True
             clearAll()
@@ -288,24 +290,28 @@ def on_message(client, userdata, msg):
         elif ("PrintDone" or "PrintCancelled" or "PrintFailed") in msg.topic:
             if debug is True:
                 print "Print Done"
+                print "----------"
 
             pState = False
 
         # Info über Druck
         elif "progress/printing" in msg.topic:
-        	if debug is True:
-        		print "Progress Update Message"
+            if debug is True:
+                print "Progress Update Message"
+                print "----------"
 
             if lastPercent < output["progress"] and output["progress"] != 100 and pState is False:
-            	if debug is True:
-            		print "Starte Druckinfo im bereits laufenden Druck"
+                if debug is True:
+                print "Starte Druckinfo im bereits laufenden Druck"
+                print "----------"
 
                 pState = True
                 clearAll()
 
             if pState is True:
-            	if debug is True:
-            		print "is Printing..."
+                if debug is True:
+                print "is Printing..."
+                print "----------"
 
                 path = output["path"].replace(".gcode", "")
 
@@ -317,8 +323,9 @@ def on_message(client, userdata, msg):
                     ledPrintState(output["progress"])
 
             else:
-            	if debug is True:
-            		print "is not Printing..."
+                if debug is True:
+                    print "is not Printing..."
+                    print "----------"
 
                 path = "Not printing..."
 
@@ -326,8 +333,9 @@ def on_message(client, userdata, msg):
 
         # Hotend
         elif "tool0" in msg.topic:
-        	if debug is True:
-        		print "Tool0 Update Message"
+            if debug is True:
+                print "Tool0 Update Message"
+                print "----------"
 
             data = [output["actual"], output["target"]]
             # Displayausgabe
@@ -341,40 +349,46 @@ def on_message(client, userdata, msg):
 
         # Bed
         elif "bed" in msg.topic:
-        	if debug is True:
-        		print "Bed Update Message"
+            if debug is True:
+                print "Bed Update Message"
+                print "----------"
 
             data = [output["actual"], output["target"]]
             displayPrintState("bed", data)
 
         # On Error or Disconnect Shut Off
         elif "Error" in msg.topic or "Disconnect" in msg.topic:
-        	if Debug is True:
-        		print "Error happens while printing"
+            if Debug is True:
+                print "Error happens while printing"
+                print "----------"
 
             client.publish("esp_tronxy_pow/relay/0/set", "0")
 
         # On shut printer off
         elif "power" in msg.topic:
             if output["power"] == "off":
-            	if debug is True:
-            		print "Power Off"
+                if debug is True:
+                    print "Power Off"
+                    print "----------"
 
                 powerOffAll()
 
             elif output["power"] == "on":
-            	if debug is True:
-            		print "Power on"
+                if debug is True:
+                    print "Power on"
+                    print "----------"
 
                 powerOnAll()
         		
         else:
-        	if debug is True:
-        		print "undefined Message..."
+            if debug is True:
+                print "undefined Message..."
+                print "----------"
 
     except BaseException:
         if debug is True:
             print "Exception: " + str(msg.payload)
+            print "----------"
 
 
 def getPrintTime(pt):
@@ -441,7 +455,8 @@ try:
         # Wenn ein Druck läuft aller 15sek
         if pState is True and (time.time()-lastTime > 15 or lastTime == 0):
         	if debug is True:
-        		print "lastTime = 0 or 5sek left (printing: " + pState + ")"
+        		print "lastTime = 0 or 5sek left (printing: " + str(pState) + ")"
+        		print "----------"
 
             lastTime = time.time()
 
@@ -473,6 +488,7 @@ try:
 
 except KeyboardInterrupt:
     print "Good Bye"
+    print "----------"
     powerOffAll()
 
 '''
