@@ -287,9 +287,9 @@ def on_message(client, userdata, msg):
             ledPrintState(0)
 
         # Druckende
-        elif ("PrintDone" or "PrintCancelling" or "PrintCancelled" or "PrintFailed") in msg.topic:
+        elif "PrintDone" in msg.topic or "PrintCancelled" in msg.topic or "PrintFailed" in msg.topic:
             if debug is True:
-                print "Print Done, switch Boardfan OFF"
+                print "Print Done, Cancelled or Failed, switch Boardfan OFF"
                 print "----------"
 
             pState = False
