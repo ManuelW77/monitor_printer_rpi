@@ -100,6 +100,7 @@ def ledHeatingState(data):
 
     if debug is True:
         print "Show ledHeatingState -> " + str(c) + " | " + str(t)
+        print "----------"
 
     # led = Prozent der Zieltemp erreicht
     led = int(c * 100.0 / t)
@@ -138,6 +139,7 @@ def displayPrintState(what, data):
 
     if debug is True:
         print "Show displayPrintState -> " + what
+        print "----------"
 
     # Trennlinie
     draw.rectangle((0, 13, 128, 15), outline=0, fill=1)
@@ -168,6 +170,7 @@ def clearAll():
     
     if debug is True:
         print "Clear Display and Strip"
+        print "----------"
 
     colorWipe(strip, Color(0, 0, 255))
 
@@ -179,6 +182,7 @@ def clearAll():
 def powerOffAll():
     if debug is True:
         print "Power OFF all!"
+        print "----------"
 
     colorWipe(strip, Color(0, 0, 0))
     draw.rectangle((0, 0, width, height), outline=0, fill=0)  # clean
@@ -189,6 +193,8 @@ def powerOffAll():
 def powerOnAll():
     if debug is True:
         print "Power ON all!"
+        print "----------"
+
     # Display Welcome Message
     draw.text((20, 0), "Willkommen ...", font=font16, fill=255)
     draw.text((35, 20), "Tronxy", font=font16, fill=255)
@@ -204,6 +210,8 @@ def powerOnAll():
 def boardFanOff():
     if debug is True:
         print "Board Fan off"
+        print "----------"
+
     # Board Fan off
     GPIO.output(rPin2, GPIO.HIGH)
 
@@ -211,6 +219,7 @@ def boardFanOff():
 def bedFanOff():
     if debug is True:
         print "Bed Fan off"
+        print "----------"
 
     # Bed Fan off
     GPIO.output(rPin3, GPIO.HIGH)
@@ -228,10 +237,12 @@ def getApiData():
 	    
 	    if debug is True:
             print "API Abfrage erfolgreich"
+            print "----------"
 
     except BaseException:
         if debug is True:
             print "Fehler beim Abfrage den API"
+            print "----------"
 
     if printTime is None:
         printTime = 0
