@@ -62,7 +62,7 @@ def ledPrintState(c, wait_ms=50):
 
     if debug is True:
 	    print "Show ledPrintState -> " + str(c) + " -> " + str(state)
-	    pint "----------"
+	    print "----------"
 
     for i in range(0, strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))
@@ -98,8 +98,8 @@ def ledHeatingState(data):
     c = data[0]
     t = data[1]
 
-	if debug is True:
-		print "Show ledHeatingState -> " + str(c) + " | " + str(t)
+    if debug is True:
+        print "Show ledHeatingState -> " + str(c) + " | " + str(t)
 
     # led = Prozent der Zieltemp erreicht
     led = int(c * 100.0 / t)
@@ -136,8 +136,8 @@ def displayPrintState(what, data):
     Blauer Bereich Reihe 17 - 64
     '''
 
-	if debug is True:
-		print "Show displayPrintState -> " + what
+    if debug is True:
+        print "Show displayPrintState -> " + what
 
     # Trennlinie
     draw.rectangle((0, 13, 128, 15), outline=0, fill=1)
@@ -166,8 +166,8 @@ def displayPrintState(what, data):
 def clearAll():
     global width, height  # Display Data
     
-	if debug is True:
-		print "Clear Display and Strip"
+    if debug is True:
+        print "Clear Display and Strip"
 
     colorWipe(strip, Color(0, 0, 255))
 
@@ -177,8 +177,8 @@ def clearAll():
 
 
 def powerOffAll():
-	if debug is True:
-		print "Power OFF all!"
+    if debug is True:
+        print "Power OFF all!"
 
     colorWipe(strip, Color(0, 0, 0))
     draw.rectangle((0, 0, width, height), outline=0, fill=0)  # clean
@@ -187,8 +187,8 @@ def powerOffAll():
 
 
 def powerOnAll():
-	if debug is True:
-		print "Power ON all!"
+    if debug is True:
+        print "Power ON all!"
     # Display Welcome Message
     draw.text((20, 0), "Willkommen ...", font=font16, fill=255)
     draw.text((35, 20), "Tronxy", font=font16, fill=255)
@@ -202,15 +202,15 @@ def powerOnAll():
 
 
 def boardFanOff():
-	if debug is True:
-		print "Board Fan off"
+    if debug is True:
+        print "Board Fan off"
     # Board Fan off
     GPIO.output(rPin2, GPIO.HIGH)
 
 
 def bedFanOff():
-	if debug is True:
-		print "Bed Fan off"
+    if debug is True:
+        print "Bed Fan off"
 
     # Bed Fan off
     GPIO.output(rPin3, GPIO.HIGH)
@@ -227,11 +227,11 @@ def getApiData():
 	    printTimeLeft = response.json()["progress"]["printTimeLeft"]
 	    
 	    if debug is True:
-	    	print "API Abfrage erfolgreich"
+            print "API Abfrage erfolgreich"
 
 	except BaseException:
-		if debug is True:
-			print "Fehler beim Abfrage den API"
+        if debug is True:
+            print "Fehler beim Abfrage den API"
 
     if printTime is None:
         printTime = 0
@@ -260,8 +260,8 @@ def on_message(client, userdata, msg):
         # Aktionen nach Topic aufteilen
         # Druckstart
         if "PrintStarted" in msg.topic:
-        	if debug is True:
-        		print "Print Started"
+            if debug is True:
+                print "Print Started"
 
             pState = True
             clearAll()
@@ -275,8 +275,8 @@ def on_message(client, userdata, msg):
 
         # Druckende
         elif ("PrintDone" or "PrintCancelled" or "PrintFailed") in msg.topic:
-        	if debug is True:
-        		print "Print Done"
+            if debug is True:
+                print "Print Done"
 
             pState = False
 
