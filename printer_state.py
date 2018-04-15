@@ -131,7 +131,7 @@ def ledHeatingState(data):
 
 
 def displayPrintState(what, data):
-    global width, height
+    global width, height, draw
 
     '''
     Gelber Bereich Reihe 0 - 15
