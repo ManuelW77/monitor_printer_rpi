@@ -235,7 +235,7 @@ def getApiData():
 	    printTime = response.json()["progress"]["printTime"]
 	    printTimeLeft = response.json()["progress"]["printTimeLeft"]
 	    
-	    if debug is True:
+        if debug is True:
             print "API Abfrage erfolgreich"
             print "----------"
 
