@@ -35,6 +35,7 @@ debug = True
 # Druckstatus
 pState = False
 printDone = False
+printerOn = False
 lastPercent = 0
 bed_data = [0, 0]
 tool0_data = [0, 0]
@@ -297,16 +298,27 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     global width, height  # Display Data
     global pState, printDone, lastPercent  # Druckstatus
-    global bed_data, tool0_data
+    global bed_data, tool0_data, printerOn
 
     if is_json(msg.payload) is True:
-        try:
-            output = json.loads(msg.payload)
-    
-            if debug is True:
-                print "Message arrived: [" + msg.topic + "]: " + str(output)
-                print "----------"
-    
+        output = json.loads(msg.payload)
+
+        if debug is True:
+            print "Message arrived: [" + msg.topic + "]: " + str(output)
+            print "----------"
+
+        # On shut printer off
+        if "power" in msg.topic:
+            if output["power"] == "off":
+                powerOffAll()
+                printerOn = False
+
+            elif output["power"] == "on":
+                powerOnAll()
+                printerOn = True
+
+        # Wenn Drucker eingeschaltet ist
+        if printerOn is True:
             # Aktionen nach Topic aufteilen
             # Druckstart
             if "PrintStarted" in msg.topic:
@@ -435,19 +447,13 @@ def on_message(client, userdata, msg):
     
                 client.publish("esp_tronxy_pow/relay/0/set", "0")
     
-            # On shut printer off
-            elif "power" in msg.topic:
-                if output["power"] == "off":
-                    powerOffAll()
-    
-                elif output["power"] == "on":
-                    powerOnAll()
             '''		
             else:
                 if debug is True:
                     print "undefined Message..."
                     print "----------"
             '''
+    
             # Alles ausschalten nach Druck und wenn unter Temps
             if printDone is True:
                 if debug is True:
@@ -458,16 +464,6 @@ def on_message(client, userdata, msg):
                 powerOffAll()
                 client.publish("esp_tronxy_pow/relay/0/set", "0")
                 printDone = False
-    
-        except Exception as err:
-            print err
-    
-            if debug is True:
-                print "Exception: " + str(msg.payload)
-                print "----------"
-            
-            # pass
-            raise
 
 
 def getPrintTime(pt):
