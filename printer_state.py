@@ -302,6 +302,7 @@ def on_message(client, userdata, msg):
                 print "Progress Update Message"
                 print "----------"
 
+            '''
             if lastPercent < output["progress"] and output["progress"] != 100 and pState is False:
                 if debug is True:
                     print "Starte Druckinfo im bereits laufenden Druck"
@@ -309,6 +310,7 @@ def on_message(client, userdata, msg):
 
                 pState = True
                 clearAll()
+            '''
 
             if pState is True:
                 if debug is True:
