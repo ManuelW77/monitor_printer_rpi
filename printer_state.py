@@ -341,7 +341,7 @@ def on_message(client, userdata, msg):
                 print "Tool0 Update Message"
                 print "----------"
 
-            data = [output["actual"], output["target"]]
+            data = int([output["actual"]), int(output["target"])]
             # Displayausgabe
             displayPrintState("tool0", data)
 
@@ -357,7 +357,7 @@ def on_message(client, userdata, msg):
                 print "Bed Update Message"
                 print "----------"
 
-            data = [output["actual"], output["target"]]
+            data = int([output["actual"]), int(output["target"])]
             displayPrintState("bed", data)
 
         # On Error or Disconnect Shut Off
@@ -403,7 +403,7 @@ def getPrintTime(pt):
     # Zeit in Stunden wenn größer 60min
     if printTime > 60:
         h = 0
-        for printTime in range(60):
+        while printTime > 60:
             h += 1
             printTime = printTime-60
 
@@ -477,6 +477,7 @@ try:
 
                 if debug is True:
                     print "D: " + getPrintTime(pTime) + " | L: " + getPrintTime(pTimeLeft)
+                    print "----------"
 
             else:
                 displayPrintTime = True
