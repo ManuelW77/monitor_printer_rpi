@@ -361,7 +361,7 @@ def on_message(client, userdata, msg):
             bed_data = [int(output["actual"]), int(output["target"])]
             displayPrintState("bed", bed_data)
             
-            if int(output["actual"]) < 38 and int(output["target"] == 0 and pState is False:
+            if int(output["actual"]) < 38 and int(output["target"]) == 0 and pState is False:
                 bedFanOff()
 
                 if debug is True:
@@ -399,7 +399,7 @@ def on_message(client, userdata, msg):
         '''
 
         # Alles ausschlten nach Druck und wenn unter Temps
-        if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 38 and bed_data[1] == 0:
+        if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 35 and bed_data[1] == 0:
             powerOffAll()
             client.publish("esp_tronxy_pow/relay/0/set", "0")
 
