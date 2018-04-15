@@ -265,9 +265,11 @@ def on_message(client, userdata, msg):
     try:
         output = json.loads(msg.payload)
 
+        '''
         if debug is True:
             print "Message arrived: [" + msg.topic + "]: " + str(output)
             print "----------"
+        '''
 
         # Aktionen nach Topic aufteilen
         # Druckstart
@@ -379,11 +381,12 @@ def on_message(client, userdata, msg):
                     print "----------"
 
                 powerOnAll()
-        		
+        '''		
         else:
             if debug is True:
                 print "undefined Message..."
                 print "----------"
+        '''
 
     except BaseException:
         if debug is True:
@@ -469,6 +472,9 @@ try:
                 pTime, pTimeLeft = getApiData()
 
                 draw.text((0, 0), "D: " + getPrintTime(pTime) + " | L: " + getPrintTime(pTimeLeft), font=font16, fill=255)
+
+                if debug is True:
+                    print "D: " + getPrintTime(pTime) + " | L: " + getPrintTime(pTimeLeft)
 
             else:
                 displayPrintTime = True
