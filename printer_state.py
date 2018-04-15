@@ -302,16 +302,16 @@ def on_message(client, userdata, msg):
 
             if lastPercent < output["progress"] and output["progress"] != 100 and pState is False:
                 if debug is True:
-                print "Starte Druckinfo im bereits laufenden Druck"
-                print "----------"
+                    print "Starte Druckinfo im bereits laufenden Druck"
+                    print "----------"
 
                 pState = True
                 clearAll()
 
             if pState is True:
                 if debug is True:
-                print "is Printing..."
-                print "----------"
+                    print "is Printing..."
+                    print "----------"
 
                 path = output["path"].replace(".gcode", "")
 
