@@ -424,7 +424,7 @@ def on_message(client, userdata, msg):
             client.publish("esp_tronxy_pow/relay/0/set", "0")
             printDone = False
 
-    except BaseException as err:
+    except Exception as err:
         print err
 
         if debug is True:
