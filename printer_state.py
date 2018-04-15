@@ -61,7 +61,7 @@ def ledPrintState(c, wait_ms=50):
     state = int(strip.numPixels()*c/100)
 
     if debug is True:
-	    print "Show ledPrintState -> " + str(c) + " -> " + str(state)
+	    print "Show ledPrintState -> " + str(c) + "% -> LED " + str(state)
 	    print "----------"
 
     for i in range(0, strip.numPixels()):
@@ -341,7 +341,7 @@ def on_message(client, userdata, msg):
                 print "Tool0 Update Message"
                 print "----------"
 
-            data = int([output["actual"]), int(output["target"])]
+            data = [int(output["actual"]), int(output["target"])]
             # Displayausgabe
             displayPrintState("tool0", data)
 
@@ -357,7 +357,7 @@ def on_message(client, userdata, msg):
                 print "Bed Update Message"
                 print "----------"
 
-            data = int([output["actual"]), int(output["target"])]
+            data = [int(output["actual"]), int(output["target"])]
             displayPrintState("bed", data)
 
         # On Error or Disconnect Shut Off
