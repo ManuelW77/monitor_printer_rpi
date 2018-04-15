@@ -52,6 +52,36 @@ GPIO.setup(rPin4, GPIO.OUT)
 # GPIO.output(rPin3, GPIO.HIGH)
 # GPIO.output(rPin4, GPIO.HIGH)
 
+# Start MQTT
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("192.168.1.5", 1883, 60)
+client.loop_start()
+
+# Start Display
+disp.begin()
+width = disp.width
+height = disp.height
+disp.clear()
+disp.display()
+
+# Display Welcome Message
+image = Image.new('1', (width, height))
+
+# Alternatively load a TTF font.  Make sure the .ttf font file is in the same directory as the python script!
+# Some other nice fonts to try: http://www.dafont.com/bitmap.php
+# font = ImageFont.truetype('Minecraftia.ttf', 8)
+# font = ImageFont.load_default()
+font16 = ImageFont.truetype('printer_state.ttf', 15)
+font8 = ImageFont.truetype('printer_state.ttf', 10)
+draw = ImageDraw.Draw(image)
+
+# Start LED Strip
+strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT)
+strip.begin()
+
+
 def colorWipe(strip, color, wait_ms=50):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
@@ -131,7 +161,7 @@ def ledHeatingState(data):
 
 
 def displayPrintState(what, data):
-    global width, height, draw
+    global width, height
 
     '''
     Gelber Bereich Reihe 0 - 15
@@ -460,35 +490,6 @@ def getPrintTime(pt):
 
     return printTime
 
-
-# Start MQTT
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect("192.168.1.5", 1883, 60)
-client.loop_start()
-
-# Start Display
-disp.begin()
-width = disp.width
-height = disp.height
-disp.clear()
-disp.display()
-
-# Display Welcome Message
-image = Image.new('1', (width, height))
-
-# Alternatively load a TTF font.  Make sure the .ttf font file is in the same directory as the python script!
-# Some other nice fonts to try: http://www.dafont.com/bitmap.php
-# font = ImageFont.truetype('Minecraftia.ttf', 8)
-# font = ImageFont.load_default()
-font16 = ImageFont.truetype('printer_state.ttf', 15)
-font8 = ImageFont.truetype('printer_state.ttf', 10)
-draw = ImageDraw.Draw(image)
-
-# Start LED Strip
-strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT)
-strip.begin()
 
 try:
     lastTime = 0
