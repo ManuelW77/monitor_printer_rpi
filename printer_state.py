@@ -231,9 +231,9 @@ def getApiData():
     headers = {"X-Api-Key": "944145C8AF374B77B6D66BD88C410C1D", "Content-Type": "application/json"}
 
     try:
-	    response = requests.get(url, headers=headers)
-	    printTime = response.json()["progress"]["printTime"]
-	    printTimeLeft = response.json()["progress"]["printTimeLeft"]
+        response = requests.get(url, headers=headers)
+        printTime = response.json()["progress"]["printTime"]
+        printTimeLeft = response.json()["progress"]["printTimeLeft"]
 	    
         if debug is True:
             print "API Abfrage erfolgreich"
