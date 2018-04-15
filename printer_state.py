@@ -62,6 +62,7 @@ def ledPrintState(c, wait_ms=50):
 
 	if debug is True:
 		print "Show ledPrintState -> " + str(c) + " -> " + str(state)
+		pint "----------"
 
     for i in range(0, strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))
