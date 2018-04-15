@@ -265,11 +265,9 @@ def on_message(client, userdata, msg):
     try:
         output = json.loads(msg.payload)
 
-        '''
         if debug is True:
             print "Message arrived: [" + msg.topic + "]: " + str(output)
             print "----------"
-        '''
 
         # Aktionen nach Topic aufteilen
         # Druckstart
@@ -291,10 +289,11 @@ def on_message(client, userdata, msg):
         # Druckende
         elif ("PrintDone" or "PrintCancelled" or "PrintFailed") in msg.topic:
             if debug is True:
-                print "Print Done"
+                print "Print Done, switch Boardfan OFF"
                 print "----------"
 
             pState = False
+            boardFanOff()
 
         # Info über Druck
         elif "progress/printing" in msg.topic:
@@ -359,6 +358,13 @@ def on_message(client, userdata, msg):
 
             data = [int(output["actual"]), int(output["target"])]
             displayPrintState("bed", data)
+            
+            if int(output["actual"]) < 38:
+                bedFanOff()
+                
+                if debug is True:
+                    print "Switch Bedfan OFF"
+                    print "----------"
 
         # On Error or Disconnect Shut Off
         elif "Error" in msg.topic or "Disconnect" in msg.topic:
@@ -391,9 +397,12 @@ def on_message(client, userdata, msg):
         '''
 
     except BaseException:
+        ex = True
+        '''
         if debug is True:
             print "Exception: " + str(msg.payload)
             print "----------"
+        '''
 
 
 def getPrintTime(pt):
