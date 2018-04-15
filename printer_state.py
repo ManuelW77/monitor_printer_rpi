@@ -430,6 +430,9 @@ def on_message(client, userdata, msg):
         if debug is True:
             print "Exception: " + str(msg.payload)
             print "----------"
+        
+        # pass
+        raise
 
 
 def getPrintTime(pt):
