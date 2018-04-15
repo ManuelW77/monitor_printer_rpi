@@ -403,17 +403,9 @@ def on_message(client, userdata, msg):
         # On shut printer off
         elif "power" in msg.topic:
             if output["power"] == "off":
-                if debug is True:
-                    print "Power Off"
-                    print "----------"
-
                 powerOffAll()
 
             elif output["power"] == "on":
-                if debug is True:
-                    print "Power on"
-                    print "----------"
-
                 powerOnAll()
         '''		
         else:
@@ -422,10 +414,11 @@ def on_message(client, userdata, msg):
                 print "----------"
         '''
         # Alles ausschalten nach Druck und wenn unter Temps
-        if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 35 and bed_data[1] == 0:
+        if printDone is True:
             if debug is True:
                 print "Watch for Power Off ----> " + str(printDone) + " - " + str(tool0_data[0]) + " - " + str(bed_data[0])
 
+        if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 35 and bed_data[1] == 0:
             powerOffAll()
             client.publish("esp_tronxy_pow/relay/0/set", "0")
             printDone = False
