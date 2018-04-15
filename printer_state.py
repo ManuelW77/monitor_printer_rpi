@@ -261,7 +261,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     global width, height  # Display Data
     global pState, printDone, lastPercent  # Druckstatus
-    global bed_data, tool0_data
+    # global bed_data, tool0_data
 
     try:
         output = json.loads(msg.payload)
