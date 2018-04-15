@@ -420,7 +420,7 @@ def on_message(client, userdata, msg):
                 print "----------"
         '''
 
-        # Alles ausschlten nach Druck und wenn unter Temps
+        # Alles ausschalten nach Druck und wenn unter Temps
         print printDone + " - " + tool0_data[0] + " - " + bed_data[0]
         if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 35 and bed_data[1] == 0:
             powerOffAll()
@@ -428,11 +428,11 @@ def on_message(client, userdata, msg):
 
     except BaseException:
         ex = True
-        '''
+
         if debug is True:
             print "Exception: " + str(msg.payload)
             print "----------"
-        '''
+
 
 
 def getPrintTime(pt):
