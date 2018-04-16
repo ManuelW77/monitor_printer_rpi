@@ -37,7 +37,7 @@ debug = True
 pState = False
 printDone = False
 printerOn = False
-lastPercent = 0
+lastPercent = -1
 bed_data = [0, 0]
 tool0_data = [0, 0]
 last_t = 0
@@ -114,17 +114,13 @@ def ledPrintState(c, wait_ms=50):
 
     if debug is True:
         print "Show ledPrintState -> " + str(c) + "% -> LED " + str(state)
-        print "--v--"
+        print "------------"
 
     for i in range(0, strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))
         strip.show()
 
     for i in range(0, state):
-        if debug is True:
-            print "Glow LED " + str(i)
-            print "----------"
-
         # bei 50% (von 33 LEDs) / rot
         if (i < 16):
             strip.setPixelColor(i, Color(0, 255, 0))
@@ -431,7 +427,7 @@ def on_message(client, userdata, msg):
 
                     path = output["path"].replace(".gcode", "")
 
-                    if output["progress"] != lastPercent or output["progress"] == 0:
+                    if output["progress"] != lastPercent:
                         # Displayausgabe
                         data = [path, output["progress"]]
                         displayPrintState("progress", data)
