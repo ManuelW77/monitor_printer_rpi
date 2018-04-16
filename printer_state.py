@@ -118,7 +118,7 @@ def ledPrintState(c, wait_ms=50):
         strip.setPixelColor(i, Color(0, 0, 0))
         strip.show()
 
-    for i in range(0, state):
+    for i in range(-1, state):
         if debug is True:
             print "Glow LED " + str(i)
             print "----------"
