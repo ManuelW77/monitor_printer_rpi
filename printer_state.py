@@ -415,8 +415,13 @@ def on_message(client, userdata, msg):
                     pState = True
                     clearAll()
                 '''
+
                 if pState is False:
                     pState = True
+
+                    if debug is True:
+                        print "Started Printinfo while printing"
+                        print "----------"
 
                 if pState is True:
                     if debug is True:
