@@ -40,6 +40,7 @@ printerOn = False
 lastPercent = 0
 bed_data = [0, 0]
 tool0_data = [0, 0]
+last_t = 0
 
 # GPIO als OUTPUT setzen
 GPIO.setmode(GPIO.BCM)
@@ -150,6 +151,8 @@ def ledPrintState(c, wait_ms=50):
 
 
 def ledHeatingState(data):
+    global last_t
+
     # c = current, t = target
     c = data[0]
     t = data[1]
@@ -159,12 +162,6 @@ def ledHeatingState(data):
         print "----------"
 
     if c > 0:
-        if 'last_t' not in locals():
-            if debug is True:
-                print "last_t dont exists, create it"
-
-            last_t = 0
-
         if t == 0 and last_t == 0:
             last_t = c
             # led = Prozent der Zieltemp  erreicht
