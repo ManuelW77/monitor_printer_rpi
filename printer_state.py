@@ -109,6 +109,8 @@ def ledStartWipe(color, wait_ms=50):
 
 def ledPrintState(c, wait_ms=50):
     state = int(strip.numPixels()*c/100)
+    if state == 0:
+        state = 1
 
     if debug is True:
         print "Show ledPrintState -> " + str(c) + "% -> LED " + str(state)
@@ -118,7 +120,7 @@ def ledPrintState(c, wait_ms=50):
         strip.setPixelColor(i, Color(0, 0, 0))
         strip.show()
 
-    for i in range(-1, state):
+    for i in range(0, state):
         if debug is True:
             print "Glow LED " + str(i)
             print "----------"
