@@ -116,10 +116,6 @@ def ledPrintState(c, wait_ms=50):
         print "Show ledPrintState -> " + str(c) + "% -> LED " + str(state)
         print "------------"
 
-    for i in range(0, strip.numPixels()):
-        strip.setPixelColor(i, Color(0, 0, 0))
-        strip.show()
-
     for i in range(0, state):
         # bei 50% (von 33 LEDs) / rot
         if (i < 16):
