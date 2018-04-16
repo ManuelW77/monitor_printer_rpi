@@ -500,7 +500,7 @@ def on_message(client, userdata, msg):
             # Alles ausschalten nach Druck und wenn unter Temps
             if printDone is True:
                 if debug is True:
-                    print "Watch for Power Off ----> " + str(printDone) + " - " + str(tool0_data[0]) + " - " + str(bed_data[0])
+                    print "Watch for Power Off ----> Druckt: " + str(pState) + " Done: " + str(printDone) + " - " + str(tool0_data[0]) + " - " + str(bed_data[0])
                     print "----------"
 
             if pState is False and printDone is True and tool0_data[0] < 35 and tool0_data[1] == 0 and bed_data[0] < 35 and bed_data[1] == 0:
