@@ -159,7 +159,7 @@ def ledHeatingState(data):
         print "----------"
 
     if c > 0:
-        if last_t not in locals():
+        if 'last_t' not in locals():
             if debug is True:
                 print "last_t dont exists, create it"
 
