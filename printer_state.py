@@ -22,6 +22,7 @@ LED_PIN = 18      # GPIO pin connected to the pixels (must support PWM!).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10  # 5       # DMA channel to use for generating signal (try 5)
 LED_INVERT = False   # True to invert the signal (when using NPN transistor level shift)
+LED_BRIGHTNESS = 100  # Helligkeit gesamt
 
 # Definition Relais Pinout
 rPin1 = 6  # Licht
@@ -72,7 +73,7 @@ font8 = ImageFont.truetype('printer_state.ttf', 10)
 draw = ImageDraw.Draw(image)
 
 # Start LED Strip
-strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT)
+strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
 strip.begin()
 
 
