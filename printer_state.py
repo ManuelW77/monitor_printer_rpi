@@ -159,11 +159,14 @@ def ledHeatingState(data):
         print "----------"
 
     if c > 0:
-        if t == 0:
-            t = c
+        if t == 0 and (last_t == 0 or 'last_t' not in locals()):
+            last_t = c
+            # led = Prozent der Zieltemp erreicht
+            led = int(c * 100.0 / last_t)
+        else:
+            # led = Prozent der Zieltemp erreicht
+            led = int(c * 100.0 / t)
 
-        # led = Prozent der Zieltemp erreicht
-        led = int(c * 100.0 / t)
         # led = Anzahl der zu läuchtenden LEDs
         led = int(led * strip.numPixels() / 100)
     else:
