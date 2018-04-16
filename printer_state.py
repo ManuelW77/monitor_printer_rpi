@@ -473,7 +473,7 @@ def on_message(client, userdata, msg):
 
             # On Error or Disconnect Shut Off
             elif "Error" in msg.topic or "Disconnect" in msg.topic:
-                if Debug is True:
+                if debug is True:
                     print "Error happens while printing"
                     print "----------"
 
