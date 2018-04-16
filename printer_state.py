@@ -160,9 +160,12 @@ def ledHeatingState(data):
 
     if c > 0:
         if 'last_t' not in locals():
+            if debug is True:
+                print "last_t dont exists, create it"
+
             last_t = 0
 
-        if t == 0 and (last_t == 0):
+        if t == 0 and last_t == 0:
             last_t = c
             # led = Prozent der Zieltemp  erreicht
             led = int(c * 100.0 / last_t)
