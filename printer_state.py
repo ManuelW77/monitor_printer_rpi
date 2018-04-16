@@ -114,9 +114,6 @@ def ledPrintState(c, wait_ms=50):
         print "Show ledPrintState -> " + str(c) + "% -> LED " + str(state)
         print "--v--"
 
-    if c == 0:
-        ledStartWipe(Color(0, 0, 255))
-
     for i in range(0, strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))
         strip.show()
@@ -375,6 +372,7 @@ def on_message(client, userdata, msg):
                 data = [path, 0]
                 displayPrintState("progress", data)
                 # LED Ausgabe
+                ledStartWipe(Color(0, 0, 255))
                 ledPrintState(0)
 
             # Druckende
