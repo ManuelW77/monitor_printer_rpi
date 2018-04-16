@@ -84,18 +84,47 @@ def colorWipe(strip, color, wait_ms=50):
         time.sleep(wait_ms/1000.0)
 
 
+def ledStartWipe(color, wait_ms=50):
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, color)
+        strip.show()
+        time.sleep(wait_ms/1000.0)
+
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, Color(0, 0, 0,))
+        strip.show()
+        time.sleep(wait_ms/1000.0)
+
+    for i in range(strip.numPixels(), -1, -1):
+        strip.setPixelColor(i, color)
+        strip.show()
+        time.sleep(wait_ms/1000.0)
+
+    for i in range(strip.numPixels(), -1, -1):
+        strip.setPixelColor(i, Color(0, 0, 0,))
+        strip.show()
+        time.sleep(wait_ms/1000.0)
+
+
 def ledPrintState(c, wait_ms=50):
     state = int(strip.numPixels()*c/100)
 
     if debug is True:
-	    print "Show ledPrintState -> " + str(c) + "% -> LED " + str(state)
-	    print "----------"
+        print "Show ledPrintState -> " + str(c) + "% -> LED " + str(state)
+        print "--v--"
+
+    if c == 0:
+        ledStartWipe(Color(0, 0, 255))
 
     for i in range(0, strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))
         strip.show()
 
     for i in range(0, state):
+        if debug is True:
+            print "Glow LED " + str(i)
+            print "----------"
+
         # bei 50% (von 33 LEDs) / rot
         if (i < 16):
             strip.setPixelColor(i, Color(0, 255, 0))
@@ -129,7 +158,10 @@ def ledHeatingState(data):
         print "Show ledHeatingState -> " + str(c) + " | " + str(t)
         print "----------"
 
-    if t > 0:
+    if c > 0:
+        if t == 0:
+            t = c
+
         # led = Prozent der Zieltemp erreicht
         led = int(c * 100.0 / t)
         # led = Anzahl der zu läuchtenden LEDs
