@@ -348,6 +348,10 @@ def on_message(client, userdata, msg):
                 powerOnAll()
                 printerOn = True
 
+        # setze Drucker auf ein, wenn ein Druck bereits läuft
+        if printerOn is False and "progress/printing" in msg.topic:
+            printerOn = True
+
         # Wenn Drucker eingeschaltet ist
         if printerOn is True:
             # Aktionen nach Topic aufteilen
