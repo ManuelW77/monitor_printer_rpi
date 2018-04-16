@@ -164,14 +164,15 @@ def ledHeatingState(data):
     if c > 0:
         if t == 0 and last_t == 0:
             last_t = c
-            # led = Prozent der Zieltemp  erreicht
-            led = int(c * 100.0 / last_t)
-        else:
-            # led = Prozent der Zieltemp erreicht
-            led = int(c * 100.0 / t)
 
+        elif t > 0:
+            last_t = t
+
+        # led = Prozent der Zieltemp erreicht
+        led = int(c * 100.0 / last_t)
         # led = Anzahl der zu läuchtenden LEDs
         led = int(led * strip.numPixels() / 100)
+
     else:
         led = 0
 
