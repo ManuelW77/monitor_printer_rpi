@@ -188,6 +188,15 @@ def ledHeatingState(data):
         strip.show()
 
 
+def fitNumbers3(number):
+    if number < 10:
+        number = "  " + str(number)
+    elif number > 10 and number < 100:
+        number = " " + str(numnber)
+
+    return number
+
+
 def displayPrintState(what, data):
     global width, height
 
@@ -215,11 +224,11 @@ def displayPrintState(what, data):
 
     if what == "tool0":
         draw.rectangle((0, 27, width, 45), outline=0, fill=0)  # clean
-        draw.text((0, 31), "Tool " + str(data[0]) + " | " + str(data[1]) + " C", font=font16, fill=255)
+        draw.text((0, 31), "Tool " + fitNumbers3(data[0]) + " | " + fitNumbers3(data[1]) + " C", font=font16, fill=255)
 
     if what == "bed":
         draw.rectangle((0, 46, width, 64), outline=0, fill=0)  # clean
-        draw.text((0, 46), " Bed " + str(data[0]) + " | " + str(data[1]) + " C", font=font16, fill=255)
+        draw.text((0, 46), " Bed " + fitNumbers3(data[0]) + " | " + fitNumbers3(data[1]) + " C", font=font16, fill=255)
 
     disp.image(image)
     disp.display()
