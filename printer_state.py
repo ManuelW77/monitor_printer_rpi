@@ -189,14 +189,12 @@ def ledHeatingState(data):
 
 
 def fitNumbers3(number):
-    number = str(number)
-
     if number < 10:
-        number = "  " + number
+        number = "  " + str(number)
     elif number > 10 and number < 100:
-        number = " " + number
+        number = " " + str(number)
 
-    return number
+    return str(number)
 
 
 def displayPrintState(what, data):
