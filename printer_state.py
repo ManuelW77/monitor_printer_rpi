@@ -154,7 +154,7 @@ def ledHeatingState(data):
 
     if c > 0:
         if t == 0 and last_t == 0:
-            last_t = c
+            last_t = 210  # c
 
         elif t > 0:
             last_t = t
