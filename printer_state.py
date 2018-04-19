@@ -50,10 +50,10 @@ GPIO.setup(rPin3, GPIO.OUT)
 GPIO.setup(rPin4, GPIO.OUT)
 
 # Alle Relais auf OFF setzen
-# GPIO.output(rPin1, GPIO.HIGH)
-# GPIO.output(rPin2, GPIO.HIGH)
-# GPIO.output(rPin3, GPIO.HIGH)
-# GPIO.output(rPin4, GPIO.HIGH)
+GPIO.output(rPin1, GPIO.HIGH)
+GPIO.output(rPin2, GPIO.HIGH)
+GPIO.output(rPin3, GPIO.HIGH)
+GPIO.output(rPin4, GPIO.HIGH)
 
 # Start Display
 disp.begin()
