@@ -555,21 +555,19 @@ def getPrintTime(pt):
     return printTime
 
 
-def sendButtonCommand(api, button):
+def sendButtonCommand(api, button, printing):
     headers = {'X-Api-Key': api, "Content-Type": "application/json"}
 
     if button == "StartStop":
         time.sleep(0.2)
-        url = 'http://127.0.0.1/api/job'
-        s = requests.Session()
-        r = json.loads((requests.get(url, headers=headers)).content)["state"]
-        print r
-        if r == "Printing":
+        if printing is True:
                 print "Stopping printing"
                 contents = json.dumps({"command": "cancel"})
         else:
                 print "Starting printing"
                 contents = json.dumps({"command": "start"})
+
+        url = 'http://localhost/api/job'
         requests.post(url, data=contents, headers=headers)
 
 
@@ -598,22 +596,22 @@ try:
         bPinEmergency_state = GPIO.input(bPinEmergency)
 
         if bPinStartStop_state is False:
-            sendButtonCommand(octoApi, "StartStop")
+            sendButtonCommand(octoApi, "StartStop", pState)
             if debug is True:
                 print('StartStop Button Pressed')
 
         if bPinPauseResume_state is False:
-            sendButtonCommand(octoApi, "PauseResume")
+            sendButtonCommand(octoApi, "PauseResume", pState)
             if debug is True:
                 print('PauseResume Button Pressed')
 
         if bPinExtrude_state is False:
-            sendButtonCommand(octoApi, "Extrude")
+            sendButtonCommand(octoApi, "Extrude", pState)
             if debug is True:
                 print('Extrude Button Pressed')
 
         if bPinEmergency_state is False:
-            sendButtonCommand(octoApi, "Emergency")
+            sendButtonCommand(octoApi, "Emergency", pState)
             if debug is True:
                 print('Emergency Button Pressed')
 
