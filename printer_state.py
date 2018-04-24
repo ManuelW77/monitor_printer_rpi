@@ -65,7 +65,22 @@ GPIO.setup(rPin3, GPIO.OUT)
 GPIO.setup(rPin4, GPIO.OUT)
 
 # GPIO für Button aktivieren
-GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(bPinStartStop, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(bPinPauseResume, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(bPinExtrude, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(bPinEmergency, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# GPIO für LEDs setzen
+GPIO.setup(bLEDStartStop, GPIO.OUT)
+GPIO.setup(bLEDPauseResume, GPIO.OUT)
+GPIO.setup(bLEDExtrude, GPIO.OUT)
+GPIO.setup(bLEDEmergency, GPIO.OUT)
+
+# GPIO für LEDs auf OFF setzen
+GPIO.setup(bLEDStartStop, GPIO.HIGH)
+GPIO.setup(bLEDPauseResume, GPIO.HIGH)
+GPIO.setup(bLEDExtrude, GPIO.HIGH)
+GPIO.setup(bLEDEmergency, GPIO.HIGH)
 
 # Alle Relais auf OFF setzen
 GPIO.output(rPin1, GPIO.HIGH)
@@ -555,7 +570,49 @@ def getPrintTime(pt):
     return printTime
 
 
+def buttonLedBlink(led, duration):
+    while True:
+        GPIO.setup(led, GPIO.LOW)
+        time.sleep(50)
+        GPIO.setup(led, GPIO.HIGH)
+        time.sleep(50)
+
+
+def buttonCommandLed(command):
+    '''
+    bLEDStartStop = 23  # Led für Start Stop
+    bLEDPauseResume = 24  # Pause Resume LED
+    bLEDExtrude = 10  # Extrusion LED
+    bLEDEmergency = 9  # Emergency LED
+    '''
+    
+    # Start Stop
+    if command == "cancel":
+        GPIO.setup(bLEDStartStop, GPIO.HIGH)
+    
+    if command == "start":
+        GPIO.setup(bLEDStartStop, GPIO.LOW)
+    
+    # Pause Resume
+    if command == "pause":
+        # buttonLedBlink("bLEDPauseResume")
+        GPIO.setup(bLEDPauseResume, GPIO.HIGH)
+    
+    if command == "resume":
+        GPIO.setup(bLEDPauseResume, GPIO.LOW)
+    
+    # Extrudieren
+    if command == "extrude":
+        GPIO.setup(bLEDExtrude, GPIO.LOW)
+    
+    # Emergency Stop
+    if command == "emergency":
+        GPIO.setup(bLEDEmergency, GPIO.LOW)
+
+
 def sendButtonCommand(api, button, printing):
+    global tool0_data, bExtrusionWide, pState, printDone
+
     headers = {'X-Api-Key': api, "Content-Type": "application/json"}
 
     if button == "StartStop":
@@ -563,12 +620,54 @@ def sendButtonCommand(api, button, printing):
         if printing is True:
                 print "Stopping printing"
                 contents = json.dumps({"command": "cancel"})
+                buttonCommandLed("cancel")
         else:
                 print "Starting printing"
                 contents = json.dumps({"command": "start"})
+                buttonCommandLed("start")
 
         url = 'http://localhost/api/job'
         requests.post(url, data=contents, headers=headers)
+    
+    if button == "PauseResume":
+        time.sleep(0.2)
+        if printing is True:
+            if debug is True:
+                print "Pause printing"
+            contents = json.dumps({"command": "pause"})
+            buttonCommandLed("pause")
+        else:
+            if debug is True:
+                print "Resume printing"
+            contents = json.dumps({"command": "resume"})
+            buttonCommandLed("resume")
+
+        url = 'http://localhost/api/job'
+        requests.post(url, data=contents, headers=headers)
+    
+    if button == "Extrude":
+        time.sleep(0.2)
+        if printing is False and tool0_data[1] > 180:
+            if debug is True:
+                print "Extrude Filament"
+
+            contents = json.dumps({"command": "extrude", "amount": bExtrusionWide})
+            url = 'http://localhost/api/printer/tool'
+            requests.post(url, data=contents, headers=headers)
+            buttonCommandLed("extrude")
+                
+        else:
+            if debug is True:
+                print "Is printing or Tool Temp < 180"
+
+    if button == "Emergency":
+        if debug is True:
+            print "Emergency Button pressed"
+
+        powerOffAll()
+        client.publish("esp_tronxy_pow/relay/0/set", "0")
+        printDone = False
+        buttonCommandLed("emergency")
 
 
 # Start MQTT
@@ -582,6 +681,7 @@ try:
     lastTime = 0
     pPercent = 0
     displayPrintTime = False
+    bEmergencyTime = 0
 
     while True:
         # Auf Buttons lauschen
@@ -597,23 +697,20 @@ try:
 
         if bPinStartStop_state is False:
             sendButtonCommand(octoApi, "StartStop", pState)
-            if debug is True:
-                print('StartStop Button Pressed')
 
         if bPinPauseResume_state is False:
             sendButtonCommand(octoApi, "PauseResume", pState)
-            if debug is True:
-                print('PauseResume Button Pressed')
 
         if bPinExtrude_state is False:
             sendButtonCommand(octoApi, "Extrude", pState)
-            if debug is True:
-                print('Extrude Button Pressed')
 
         if bPinEmergency_state is False:
-            sendButtonCommand(octoApi, "Emergency", pState)
-            if debug is True:
-                print('Emergency Button Pressed')
+            bEmergencyTime += 1
+            
+            if bEmergencyTime == 5:
+                sendButtonCommand(octoApi, "Emergency", pState)
+        else:
+            bEmergencyTime = 0
 
         # Wenn ein Druck läuft aller 15sek Anzeige wechseln
         if pState is True and (time.time()-lastTime > 15 or lastTime == 0):
