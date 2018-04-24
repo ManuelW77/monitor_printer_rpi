@@ -12,6 +12,9 @@ from PIL import Image, ImageDraw, ImageFont
 from neopixel import *
 
 
+# Octoprint API
+octoApi = "944145C8AF374B77B6D66BD88C410C1D"
+
 # Definition Display / Pin 3 (SDA) und 5 (SCL)
 RST = 24
 disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST)
@@ -30,8 +33,20 @@ rPin2 = 13  # Bordfan
 rPin3 = 19  # Bedfan
 rPin4 = 26  # leer
 
+# Button Pins
+bPinStartStop = 17  # Start Stop Print
+bPinPauseResume = 27  # Pause Resume Print
+bPinExtrude = 22  # Extrude Filament
+bExtrusionWide = 50  # mm to extrude
+bPinEmergency = 18  # Notaus
+
+bLEDStartStop = 23  # Led für Start Stop
+bLEDPauseResume = 24  # Pause Resume LED
+bLEDExtrude = 10  # Extrusion LED
+bLEDEmergency = 9  # Emergency LED
+
 # Debug
-debug = True
+debug = False
 
 # Druckstatus
 pState = False
@@ -48,6 +63,9 @@ GPIO.setup(rPin1, GPIO.OUT)
 GPIO.setup(rPin2, GPIO.OUT)
 GPIO.setup(rPin3, GPIO.OUT)
 GPIO.setup(rPin4, GPIO.OUT)
+
+# GPIO für Button aktivieren
+GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Alle Relais auf OFF setzen
 GPIO.output(rPin1, GPIO.HIGH)
@@ -69,8 +87,8 @@ image = Image.new('1', (width, height))
 # Some other nice fonts to try: http://www.dafont.com/bitmap.php
 # font = ImageFont.truetype('Minecraftia.ttf', 8)
 # font = ImageFont.load_default()
-font16 = ImageFont.truetype('printer_state.ttf', 15)
-font8 = ImageFont.truetype('printer_state.ttf', 10)
+font16 = ImageFont.truetype('/home/pi/printer_state.ttf', 15)
+font8 = ImageFont.truetype('/home/pi/printer_state.ttf', 10)
 draw = ImageDraw.Draw(image)
 
 # Start LED Strip
@@ -294,10 +312,10 @@ def bedFanOff():
     GPIO.output(rPin3, GPIO.HIGH)
 
 
-def getApiData():
+def getApiData(api):
     # RestAPI
     url = "http://localhost/api/job"
-    headers = {"X-Api-Key": "944145C8AF374B77B6D66BD88C410C1D", "Content-Type": "application/json"}
+    headers = {"X-Api-Key": api, "Content-Type": "application/json"}
 
     try:
         response = requests.get(url, headers=headers)
@@ -537,6 +555,24 @@ def getPrintTime(pt):
     return printTime
 
 
+def sendButtonCommand(api, button):
+    headers = {'X-Api-Key': api, "Content-Type": "application/json"}
+
+    if button == "StartStop":
+        time.sleep(0.2)
+        url = 'http://127.0.0.1/api/job'
+        s = requests.Session()
+        r = json.loads((requests.get(url, headers=headers)).content)["state"]
+        print r
+        if r == "Printing":
+                print "Stopping printing"
+                contents = json.dumps({"command": "cancel"})
+        else:
+                print "Starting printing"
+                contents = json.dumps({"command": "start"})
+        requests.post(url, data=contents, headers=headers)
+
+
 # Start MQTT
 client = mqtt.Client()
 client.on_connect = on_connect
@@ -550,7 +586,38 @@ try:
     displayPrintTime = False
 
     while True:
-        # Wenn ein Druck läuft aller 15sek
+        # Auf Buttons lauschen
+        # bPinStartStop = 17  # Start Stop Print
+        # bPinPauseResume = 27  # Pause Resume Print
+        # bPinExtrude = 22  # Extrude Filament
+        # bExtrusionWide = 50  # mm to extrude
+        # bPinEmergency = 18  # Notaus
+        bPinStartStop_state = GPIO.input(bPinStartStop)
+        bPinPauseResume_state = GPIO.input(bPinPauseResume)
+        bPinExtrude_state = GPIO.input(bPinExtrude)
+        bPinEmergency_state = GPIO.input(bPinEmergency)
+
+        if bPinStartStop_state is False:
+            sendButtonCommand(octoApi, "StartStop")
+            if debug is True:
+                print('StartStop Button Pressed')
+
+        if bPinPauseResume_state is False:
+            sendButtonCommand(octoApi, "PauseResume")
+            if debug is True:
+                print('PauseResume Button Pressed')
+
+        if bPinExtrude_state is False:
+            sendButtonCommand(octoApi, "Extrude")
+            if debug is True:
+                print('Extrude Button Pressed')
+
+        if bPinEmergency_state is False:
+            sendButtonCommand(octoApi, "Emergency")
+            if debug is True:
+                print('Emergency Button Pressed')
+
+        # Wenn ein Druck läuft aller 15sek Anzeige wechseln
         if pState is True and (time.time()-lastTime > 15 or lastTime == 0):
             if debug is True:
                 print "lastTime = 0 or 5sek left (printing: " + str(pState) + ")"
@@ -564,7 +631,7 @@ try:
                 displayPrintTime = False
 
                 # Hole Druckzeiten per RestAPI
-                pTime, pTimeLeft = getApiData()
+                pTime, pTimeLeft = getApiData(octoApi)
 
                 draw.text((0, 0), "D: " + getPrintTime(pTime) + " | L: " + getPrintTime(pTimeLeft), font=font16, fill=255)
 
@@ -586,7 +653,7 @@ try:
             disp.display()
 
         # Programm 1s schlafen lassen
-        time.sleep(1)
+        # time.sleep(1)
 
 except KeyboardInterrupt:
     print "Good Bye"
